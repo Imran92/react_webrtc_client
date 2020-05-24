@@ -5,6 +5,8 @@ import TextInputWithButtonContainer from './Components/MessageInputContainerComp
 import ChatService from './Services/ChatService';
 import { GlobalContext, EventNames } from './Shared/Consts';
 import { MessageContainer } from './Components/MessageContainerComponent';
+import { GameCanvas } from './Components/GameCanvasComponent';
+
 
 interface props {
 
@@ -44,23 +46,35 @@ class App extends React.Component<props, {}> {
           <div className="container pt-3 border main-body">
             <h2 className="header">{this.headerTag}</h2>
             <h5 className="header">{(this.chatService.myName ?? '') + (this.chatService.connectedUser === '' ? '' : (' and ' + this.chatService.connectedUser))}</h5>
-            <MessageContainer></MessageContainer>
-            <TextInputWithButtonContainer callbackFunction={(callbackValue: string) => { this.chatService.sendRtcMessage(callbackValue); }}
-              buttonContent={<i className="fa fa-paper-plane" style={{ margin: "auto" }}></i>}
-              inputWidth="95%"
-              buttonWidth="5%"></TextInputWithButtonContainer>
-            <TextInputWithButtonContainer width="60%" callbackFunction={(callbackValue: string) => { this.chatService.sendLoginRequest(callbackValue); }}
-              inputWidth="65%"
-              buttonWidth="35%"
-              buttonClass="btn-success"
-              clearAfterCallback={false}
-              buttonContent={<span style={{ margin: "auto" }}><strong>Login</strong></span>}></TextInputWithButtonContainer>
-            <TextInputWithButtonContainer width="60%" callbackFunction={(callbackValue: string) => { this.chatService.sendOfferToUser(callbackValue); }}
-              inputWidth="65%"
-              buttonWidth="35%"
-              buttonClass="btn-info"
-              clearAfterCallback={false}
-              buttonContent={<span style={{ margin: "auto" }}><strong>Connect</strong></span>}></TextInputWithButtonContainer>
+            <div style={{ height: '550px', background: 'WHITE' }}>
+              <GameCanvas></GameCanvas>
+            </div>
+            <div className={this.chatService.myName === '' ? '' : 'no-display'}>
+              <TextInputWithButtonContainer width="100%" callbackFunction={(callbackValue: string) => { this.chatService.sendLoginRequest(callbackValue); }}
+                inputWidth="65%"
+                buttonWidth="35%"
+                buttonClass="btn-success"
+                clearAfterCallback={false}
+                buttonContent={<span style={{ margin: "auto" }}><strong>Login</strong></span>}></TextInputWithButtonContainer>
+            </div>
+
+            <div className={this.chatService.myName !== '' && this.chatService.connectedUser !== '' ? '' : 'no-display'}>
+              <MessageContainer></MessageContainer>
+              <TextInputWithButtonContainer callbackFunction={(callbackValue: string) => { this.chatService.sendRtcMessage(callbackValue); }}
+                buttonContent={<i className="fa fa-paper-plane" style={{ margin: "auto" }}></i>}
+                inputWidth="92%"
+                buttonWidth="8%"></TextInputWithButtonContainer>
+            </div>
+            <div className={this.chatService.myName !== '' && this.chatService.connectedUser === '' ? '' : 'no-display'}>
+              <TextInputWithButtonContainer width="100%" callbackFunction={(callbackValue: string) => { this.chatService.sendOfferToUser(callbackValue); }}
+                inputWidth="65%"
+                buttonWidth="35%"
+                buttonClass="btn-info"
+                clearAfterCallback={false}
+                buttonContent={<span style={{ margin: "auto" }}><strong>Connect</strong></span>}></TextInputWithButtonContainer>
+            </div>
+
+
           </div>
         </div>
       </GlobalContext.Provider>

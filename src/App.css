@@ -11,7 +11,7 @@
 }
 
 .message-container{
-  height: 500px;
+  height: 220px;
   background-color: black;
   margin-bottom: 0px;
   overflow: auto;
@@ -56,4 +56,8 @@
 }
 .message-data{
   padding: 6px;
+}
+
+.no-display{
+  display: none;
 }

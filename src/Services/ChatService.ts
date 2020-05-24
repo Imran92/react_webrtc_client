@@ -102,10 +102,6 @@ class ChatService {
         this.connection.send(JSON.stringify(message));
     }
     openDataChannel() {
-        var dataChannelOptions = {
-            reliable: true,
-        };
-
         this.dataChannel = this.rtcConnection?.createDataChannel(
             "myDataChannel"
         );

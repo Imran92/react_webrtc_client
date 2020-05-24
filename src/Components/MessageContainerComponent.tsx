@@ -1,7 +1,8 @@
-import React, { FunctionComponent, useEffect, useContext } from 'react';
+import React from 'react';
 import { MessageItem } from '../Models/dtos';
 import ChatService from '../Services/ChatService';
 import { GlobalContext, EventNames } from '../Shared/Consts';
+import { animateScroll } from "react-scroll";
 
 interface ContainerState {
     messages: MessageItem[]
@@ -25,6 +26,11 @@ export class MessageContainer extends React.Component {
     componentWillUnmount() {
         this.chatService.unbindFromEvent(EventNames.MESSAGE_LIST_UPDATED, this.handleMessageUpdate);
     }
+    componentDidUpdate() {
+        animateScroll.scrollToBottom({
+            containerId: "message-container"
+        });
+    }
     handleMessageUpdate = () => {
         this.setState({
             messages: this.chatService.messages
@@ -34,7 +40,7 @@ export class MessageContainer extends React.Component {
 
         return (
             <div>
-                <div className="message-container">
+                <div id="message-container" className="message-container">
                     {this.state.messages.map(s =>
                         <div className="userchat">
                             <div className={'innter-item ' + (s.IsMine ? 'right' : 'left') + '-float'}>
