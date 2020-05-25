@@ -43,6 +43,7 @@ export class GameCanvas extends React.Component {
         this.chatService = this.context.chatService;
         var st = this.state;
         st.canvSize = this.compRef.current.offsetWidth;
+        st.enemyPos = { x: st.canvSize - this.tankWidth, y: 0 };
         this.setState({
             st
         });
@@ -65,12 +66,25 @@ export class GameCanvas extends React.Component {
         img.src = 'tank3.png';
         img2.src = 'tank4.png';
         this.interval = setInterval(() => {
-
             if (this.state.bullets.length > 0 || this.state.enemyBullets.length > 0) {
                 var tempState = this.state;
-                var bullets = this.state.bullets.map(s => { return { x: s.x + this.bulletSpeed, y: s.y } as CoOrdinate }).filter(s => s.x < this.ctx.canvas.width);
+                var bullets = this.state.bullets.map(s => {
+                    if (this.doesHitTank(this.state.enemyPos, s)) {
+                        this.chatService.myScore++;
+                        this.chatService.raiseEvent(EventNames.SCORE_UPDATED, null);
+                        return { x: this.state.canvSize, y: s.y } as CoOrdinate
+                    }
+                    return { x: s.x + this.bulletSpeed, y: s.y } as CoOrdinate
+                }).filter(s => s.x < this.ctx.canvas.width);
                 tempState.bullets = bullets;
-                var enemyBullets = this.state.enemyBullets.map(s => { return { x: s.x - this.bulletSpeed, y: s.y } as CoOrdinate }).filter(s => s.x > 0);
+                var enemyBullets = this.state.enemyBullets.map(s => {
+                    if (this.doesHitTank(this.state.myPos, s)) {
+                        this.chatService.opponentScore++;
+                        this.chatService.raiseEvent(EventNames.SCORE_UPDATED, null);
+                        return { x: 0, y: s.y } as CoOrdinate
+                    }
+                    return { x: s.x - this.bulletSpeed, y: s.y } as CoOrdinate
+                }).filter(s => s.x > 0);
                 tempState.enemyBullets = enemyBullets;
                 this.setState({
                     tempState
@@ -80,7 +94,10 @@ export class GameCanvas extends React.Component {
         }, 15);
         this.chatService.bindToEvent(EventNames.TANK_POSITION_RECEIVED, this.receiveTankCordinateHandle);
         this.chatService.bindToEvent(EventNames.BULLET_RECEIVED, this.receiveBulletHandle);
-
+    }
+    doesHitTank = (tank: CoOrdinate, bullet: CoOrdinate): boolean => {
+        var bulletCenter = { x: bullet.x + (this.bulletWidth / 2), y: bullet.y + (this.bulletHeight / 2) } as CoOrdinate;
+        return bulletCenter.x > tank.x && bulletCenter.x < tank.x + this.tankWidth && bulletCenter.y > tank.y && bulletCenter.y < tank.y + this.tankHeight;
     }
     componentWillUnmount() {
         clearInterval(this.interval);
@@ -98,7 +115,7 @@ export class GameCanvas extends React.Component {
     receiveTankCordinateHandle = (msg: RtcMessage) => {
         var tankCoord: CoOrdinate = JSON.parse(msg.MessageValue);
         var s = this.state;
-        s.enemyPos = tankCoord;
+        s.enemyPos = { x: this.state.canvSize - tankCoord.x - this.tankWidth, y: tankCoord.y } as CoOrdinate;
         this.setState({
             s
         });
@@ -107,12 +124,12 @@ export class GameCanvas extends React.Component {
     renderCanvas = () => {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.ctx.drawImage(this.imageSource, this.state.myPos.x, this.state.myPos.y, this.tankWidth, this.tankHeight);
-        this.ctx.drawImage(this.imageSource2, this.ctx.canvas.width - this.tankWidth - this.state.enemyPos.x, this.state.enemyPos.y, this.tankWidth, this.tankHeight);
+        this.ctx.drawImage(this.imageSource2, this.state.enemyPos.x, this.state.enemyPos.y, this.tankWidth, this.tankHeight);
         this.state.bullets.forEach(s => {
-            this.ctx.drawImage(this.imageSource, s.x, s.y, 3, 3);
+            this.ctx.drawImage(this.imageSource, s.x, s.y, this.bulletWidth, this.bulletHeight);
         });
         this.state.enemyBullets.forEach(s => {
-            this.ctx.drawImage(this.imageSource, s.x, s.y, 3, 3);
+            this.ctx.drawImage(this.imageSource, s.x, s.y, this.bulletWidth, this.bulletHeight);
         });
     }
 

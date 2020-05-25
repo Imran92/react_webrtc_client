@@ -26,15 +26,20 @@ class App extends React.Component {
     console.log('Did mount called');
     this.chatService.bindToEvent(EventNames.LOGIN_SUCCESS, this.handleLogin);
     this.chatService.bindToEvent(EventNames.USER_CONNECTED, this.handleLogin);
+    this.chatService.bindToEvent(EventNames.SCORE_UPDATED, this.handleScoreUpdated);
   }
   componentWillUnmount() {
     console.log('Will unmount called');
     this.chatService.unbindFromEvent(EventNames.LOGIN_SUCCESS, this.handleLogin);
     this.chatService.unbindFromEvent(EventNames.USER_CONNECTED, this.handleLogin);
+    this.chatService.unbindFromEvent(EventNames.SCORE_UPDATED, this.handleScoreUpdated);
   }
   handleLogin = () => {
     console.log('login handle called');
     console.log(this.chatService.connectedUser);
+    this.setState({});
+  }
+  handleScoreUpdated = () => {
     this.setState({});
   }
   private headerTag: string = 'Fao Chat 0.1';
@@ -45,7 +50,7 @@ class App extends React.Component {
         <div className="App">
           <div className="container pt-3 border main-body">
             <h2 className="header">{this.headerTag}</h2>
-            <h5 className="header">{(this.chatService.myName ?? '') + (this.chatService.connectedUser === '' ? '' : (' VS ' + this.chatService.connectedUser))}</h5>
+            <h5 className="header">{(this.chatService.myName == '' ? '' : (this.chatService.myName + ' : ' + this.chatService.myScore)) + (this.chatService.connectedUser === '' ? '' : (' VS ' + this.chatService.connectedUser + ' : ' + this.chatService.opponentScore))}</h5>
             <div style={{ height: '550px', background: 'WHITE' }}>
               <GameCanvas></GameCanvas>
             </div>

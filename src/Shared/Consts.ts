@@ -38,6 +38,7 @@ export class EventNames {
     static readonly DIMENSION_RECEIVED: string = 'DIMENSION_RECEIVED';
     static readonly TANK_POSITION_RECEIVED: string = 'TANK_POSITION_RECEIVED';
     static readonly SCREEN_DIMENSION_RECEIVED: string = 'SCREEN_DIMENSION_RECEIVED';
+    static readonly SCORE_UPDATED: string = 'SCORE_UPDATED';
 }
 export interface Services {
     chatService: ChatService

@@ -11,6 +11,8 @@ class ChatService {
     connectedUser: string;
     myName: string = '';
     isOfferer: boolean = true;
+    public myScore: number = 0;
+    public opponentScore: number = 0;
     constructor() {
         this.connection = new WebSocket("ws://demeterwel.com/faochatws");
         this.connection.onopen = () => {
@@ -163,6 +165,9 @@ class ChatService {
     }
     unbindFromEvent(eventName: string, func: (val: any) => void) {
         this.eventEmitter.removeListener(eventName, func);
+    }
+    raiseEvent(eventName: string, val: any) {
+        this.eventEmitter.emit(eventName, val);
     }
     beep() {
         var snd = new Audio(
