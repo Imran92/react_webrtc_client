@@ -41,6 +41,7 @@ export class GameCanvas extends React.Component {
     private bulletWidth: number = 6;
     private bulletHeight: number = 6;
     private bulletSpeed: number = 5;
+    private loadedImageCount: number = 0;
     componentDidMount() {
         this.chatService = this.context.chatService;
         var st = this.state;
@@ -49,37 +50,9 @@ export class GameCanvas extends React.Component {
         this.setState({
             st
         });
-        const img = new Image();
-        img.width = this.tankWidth;
-        img.height = this.tankHeight;
-        const img2 = new Image();
-        const bulletImg1 = new Image();
-        const bulletImg2 = new Image();
         const canvRef = this.refs.canvas as HTMLCanvasElement;
         this.ctx = canvRef.getContext('2d') as CanvasRenderingContext2D;
         this.ctx.imageSmoothingEnabled = false;
-        img.onload = () => {
-            console.log('loaded');
-            this.imageSource = img;
-        }
-        img2.onload = () => {
-            console.log('loaded');
-            this.imageSource2 = img2;
-
-        }
-        bulletImg1.onload = () => {
-            console.log('loaded');
-            this.bulletSource1 = bulletImg1;
-        }
-        bulletImg2.onload = () => {
-            console.log('loaded');
-            this.bulletSource2 = bulletImg2;
-            this.renderCanvas();
-        }
-        img.src = 'tank3.png';
-        img2.src = 'tank4.png';
-        bulletImg1.src = 'bullet1.png';
-        bulletImg2.src = 'bullet2.png';
         this.interval = setInterval(() => {
             if (this.state.bullets.length > 0 || this.state.enemyBullets.length > 0) {
                 var tempState = this.state;
@@ -109,6 +82,39 @@ export class GameCanvas extends React.Component {
         }, 15);
         this.chatService.bindToEvent(EventNames.TANK_POSITION_RECEIVED, this.receiveTankCordinateHandle);
         this.chatService.bindToEvent(EventNames.BULLET_RECEIVED, this.receiveBulletHandle);
+        const img = new Image();
+        const img2 = new Image();
+        const bulletImg1 = new Image();
+        const bulletImg2 = new Image();
+        img.src = 'tank3.png';
+        img2.src = 'tank4.png';
+        bulletImg1.src = 'bullet1.png';
+        bulletImg2.src = 'bullet2.png';
+        img.onload = () => {
+            this.imageSource = img;
+            this.loadedImageCount++;
+            this.loadAfterAllImageLoad();
+        }
+        img2.onload = () => {
+            this.imageSource2 = img2;
+            this.loadedImageCount++;
+            this.loadAfterAllImageLoad();
+        }
+        bulletImg1.onload = () => {
+            this.bulletSource1 = bulletImg1;
+            this.loadedImageCount++;
+            this.loadAfterAllImageLoad();
+        }
+        bulletImg2.onload = () => {
+            this.bulletSource2 = bulletImg2;
+            this.loadedImageCount++;
+            this.loadAfterAllImageLoad();
+        }
+
+    }
+    loadAfterAllImageLoad = () => {
+        if (this.loadedImageCount == 4)
+            this.renderCanvas();
     }
     doesHitTank = (tank: CoOrdinate, bullet: CoOrdinate): boolean => {
         var bulletCenter = { x: bullet.x + (this.bulletWidth / 2), y: bullet.y + (this.bulletHeight / 2) } as CoOrdinate;
