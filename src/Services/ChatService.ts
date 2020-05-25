@@ -1,6 +1,6 @@
-import ConfigSettings, { EventNames } from "../Shared/Consts";
+import ConfigSettings, { EventNames, RtcMessageTypes } from "../Shared/Consts";
 import { EventEmitter } from "events";
-import { MessageItem } from "../Models/dtos";
+import { MessageItem, RtcMessage } from "../Models/dtos";
 
 class ChatService {
     connection: WebSocket;
@@ -10,7 +10,7 @@ class ChatService {
     messages: MessageItem[] = [];
     connectedUser: string;
     myName: string = '';
-    private offeredToUser = '';
+    isOfferer: boolean = true;
     constructor() {
         this.connection = new WebSocket("ws://demeterwel.com/faochatws");
         this.connection.onopen = () => {
@@ -55,6 +55,7 @@ class ChatService {
                 console.log("offer received");
                 this.onOffer(data);
                 console.log(message);
+                this.isOfferer = false;
                 break;
             case "answer":
                 console.log("answer received");
@@ -116,13 +117,30 @@ class ChatService {
 
         this.dataChannel.onmessage = (event) => {
             console.log("Got message:", event.data);
-            this.addMsg(event.data, false);
-            this.beep();
+            var msg: RtcMessage = JSON.parse(event.data);
+            switch (msg.MessageType) {
+                case RtcMessageTypes.CHAT_MESSAGE:
+                    this.addMsg(msg.MessageValue, false);
+                    this.beep();
+                    break;
+                case RtcMessageTypes.SCREEN_DIMENSION:
+                    this.eventEmitter.emit(EventNames.SCREEN_DIMENSION_RECEIVED);
+                    break;
+                case RtcMessageTypes.BULLET_POSITION:
+                    this.eventEmitter.emit(EventNames.BULLET_RECEIVED);
+                    break;
+                case RtcMessageTypes.TANK_POSITION:
+                    this.eventEmitter.emit(EventNames.TANK_POSITION_RECEIVED);
+                    break;
+            }
         };
     }
     sendRtcMessage = (body: string) => {
-        this.dataChannel?.send(body);
+        this.publishViaDataChannel({ MessageType: RtcMessageTypes.CHAT_MESSAGE, MessageValue: body })
         this.addMsg(body, true);
+    }
+    publishViaDataChannel = (msg: RtcMessage) => {
+        this.dataChannel?.send(JSON.stringify(msg));
     }
     addMsg(msg: string, isMe: boolean) {
         this.messages.push({ Body: msg, IsMine: isMe });

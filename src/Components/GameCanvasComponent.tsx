@@ -1,4 +1,6 @@
 import React from 'react';
+import { GlobalContext } from '../Shared/Consts';
+import ChatService from '../Services/ChatService';
 
 interface bullet {
     x: number;
@@ -7,18 +9,26 @@ interface bullet {
 interface GameState {
     myX: number,
     myY: number,
-    bullets: bullet[]
+    bullets: bullet[],
+    enemyBullets: bullet[],
+    enemyX: number,
+    enemyY: number
 }
 export class GameCanvas extends React.Component {
-
+    static contextType = GlobalContext;
+    private chatService: ChatService = {} as ChatService;
     state: GameState = {
         myX: 0,
         myY: 0,
-        bullets: []
+        bullets: [],
+        enemyBullets: [],
+        enemyX: 0,
+        enemyY: 0
     }
     private ctx: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private imageSource: CanvasImageSource = {} as CanvasImageSource;
     private interval: NodeJS.Timeout = {} as NodeJS.Timeout;
+
     componentDidMount() {
         const img = new Image();
         const canvRef = this.refs.canvas as HTMLCanvasElement;
@@ -46,7 +56,9 @@ export class GameCanvas extends React.Component {
     componentWillUnmount() {
         clearInterval(this.interval);
     }
+    receiveBulletHandle = () => {
 
+    }
     renderCanvas = () => {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.ctx.drawImage(this.imageSource, this.state.myX, this.state.myY, 28, 10);

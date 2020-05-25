@@ -34,11 +34,20 @@ export class EventNames {
     static readonly USER_CONNECTED: string = 'USER_CONNECTED';
     static readonly MESSAGE_LIST_UPDATED: string = 'MESSAGE_LIST_UPDATED';
     static readonly LOGIN_SUCCESS: string = 'LOGIN_SUCCESS';
+    static readonly BULLET_RECEIVED: string = 'BULLET_RECEIVED';
+    static readonly DIMENSION_RECEIVED: string = 'DIMENSION_RECEIVED';
+    static readonly TANK_POSITION_RECEIVED: string = 'TANK_POSITION_RECEIVED';
+    static readonly SCREEN_DIMENSION_RECEIVED: string = 'SCREEN_DIMENSION_RECEIVED';
 }
 export interface Services {
     chatService: ChatService
 }
-
+export enum RtcMessageTypes {
+    CHAT_MESSAGE = 0,
+    BULLET_POSITION,
+    TANK_POSITION,
+    SCREEN_DIMENSION
+}
 export const GlobalContext = React.createContext<Services>({} as Services);
 
 export default ConfigSettings;
