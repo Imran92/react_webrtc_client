@@ -8,13 +8,13 @@ import { MessageContainer } from './Components/MessageContainerComponent';
 import { GameCanvas } from './Components/GameCanvasComponent';
 
 
-interface props {
-
+interface AppState {
+  gameCanvasWidth: 100
 }
-class App extends React.Component<props, {}> {
+class App extends React.Component {
   state = {};
   chatService: ChatService = {} as ChatService;
-  constructor(props: props) {
+  constructor(props: any) {
     super(props);
     console.log('Cons called');
   }
