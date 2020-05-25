@@ -178,9 +178,9 @@ export class GameCanvas extends React.Component {
                 break;
         }
         var st = this.state;
-        if (st.myPos.x !== 0 || dx > 0)
+        if ((st.myPos.x <= 0 && dx > 0) || (st.myPos.x + this.tankWidth >= st.canvSize && dx < 0) || (st.myPos.x > 0 && st.myPos.x + this.tankWidth < st.canvSize && dx !== 0))
             st.myPos.x += dx;
-        if (st.myPos.y !== 0 || dy > 0)
+        if ((st.myPos.y <= 0 && dy > 0) || (st.myPos.y + this.tankHeight >= this.ctx.canvas.height && dy < 0) || (st.myPos.y > 0 && st.myPos.y + this.tankHeight < this.ctx.canvas.height && dy !== 0))
             st.myPos.y += dy;
         console.log(evt.keyCode);
 
