@@ -33,12 +33,14 @@ export class GameCanvas extends React.Component {
     private ctx: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
     private imageSource: CanvasImageSource = {} as CanvasImageSource;
     private imageSource2: CanvasImageSource = {} as CanvasImageSource;
+    private bulletSource1: CanvasImageSource = {} as CanvasImageSource;
+    private bulletSource2: CanvasImageSource = {} as CanvasImageSource;
     private interval: NodeJS.Timeout = {} as NodeJS.Timeout;
     private tankWidth: number = 160;
     private tankHeight: number = 60;
-    private bulletWidth: number = 3;
-    private bulletHeight: number = 3;
-    private bulletSpeed: number = 4;
+    private bulletWidth: number = 6;
+    private bulletHeight: number = 6;
+    private bulletSpeed: number = 5;
     componentDidMount() {
         this.chatService = this.context.chatService;
         var st = this.state;
@@ -51,6 +53,8 @@ export class GameCanvas extends React.Component {
         img.width = this.tankWidth;
         img.height = this.tankHeight;
         const img2 = new Image();
+        const bulletImg1 = new Image();
+        const bulletImg2 = new Image();
         const canvRef = this.refs.canvas as HTMLCanvasElement;
         this.ctx = canvRef.getContext('2d') as CanvasRenderingContext2D;
         this.ctx.imageSmoothingEnabled = false;
@@ -61,10 +65,21 @@ export class GameCanvas extends React.Component {
         img2.onload = () => {
             console.log('loaded');
             this.imageSource2 = img2;
+
+        }
+        bulletImg1.onload = () => {
+            console.log('loaded');
+            this.bulletSource1 = bulletImg1;
+        }
+        bulletImg2.onload = () => {
+            console.log('loaded');
+            this.bulletSource2 = bulletImg2;
             this.renderCanvas();
         }
         img.src = 'tank3.png';
         img2.src = 'tank4.png';
+        bulletImg1.src = 'bullet1.png';
+        bulletImg2.src = 'bullet2.png';
         this.interval = setInterval(() => {
             if (this.state.bullets.length > 0 || this.state.enemyBullets.length > 0) {
                 var tempState = this.state;
@@ -126,10 +141,10 @@ export class GameCanvas extends React.Component {
         this.ctx.drawImage(this.imageSource, this.state.myPos.x, this.state.myPos.y, this.tankWidth, this.tankHeight);
         this.ctx.drawImage(this.imageSource2, this.state.enemyPos.x, this.state.enemyPos.y, this.tankWidth, this.tankHeight);
         this.state.bullets.forEach(s => {
-            this.ctx.drawImage(this.imageSource, s.x, s.y, this.bulletWidth, this.bulletHeight);
+            this.ctx.drawImage(this.bulletSource1, s.x, s.y, this.bulletWidth, this.bulletHeight);
         });
         this.state.enemyBullets.forEach(s => {
-            this.ctx.drawImage(this.imageSource, s.x, s.y, this.bulletWidth, this.bulletHeight);
+            this.ctx.drawImage(this.bulletSource2, s.x, s.y, this.bulletWidth, this.bulletHeight);
         });
     }
 
