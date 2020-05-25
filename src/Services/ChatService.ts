@@ -127,10 +127,10 @@ class ChatService {
                     this.eventEmitter.emit(EventNames.SCREEN_DIMENSION_RECEIVED);
                     break;
                 case RtcMessageTypes.BULLET_POSITION:
-                    this.eventEmitter.emit(EventNames.BULLET_RECEIVED);
+                    this.eventEmitter.emit(EventNames.BULLET_RECEIVED, msg);
                     break;
                 case RtcMessageTypes.TANK_POSITION:
-                    this.eventEmitter.emit(EventNames.TANK_POSITION_RECEIVED);
+                    this.eventEmitter.emit(EventNames.TANK_POSITION_RECEIVED, msg);
                     break;
             }
         };

@@ -45,7 +45,7 @@ class App extends React.Component {
         <div className="App">
           <div className="container pt-3 border main-body">
             <h2 className="header">{this.headerTag}</h2>
-            <h5 className="header">{(this.chatService.myName ?? '') + (this.chatService.connectedUser === '' ? '' : (' and ' + this.chatService.connectedUser))}</h5>
+            <h5 className="header">{(this.chatService.myName ?? '') + (this.chatService.connectedUser === '' ? '' : (' VS ' + this.chatService.connectedUser))}</h5>
             <div style={{ height: '550px', background: 'WHITE' }}>
               <GameCanvas></GameCanvas>
             </div>

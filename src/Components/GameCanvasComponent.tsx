@@ -1,5 +1,5 @@
 import React from 'react';
-import { GlobalContext, RtcMessageTypes } from '../Shared/Consts';
+import { GlobalContext, RtcMessageTypes, EventNames } from '../Shared/Consts';
 import ChatService from '../Services/ChatService';
 import { RtcMessage } from '../Models/dtos';
 
@@ -38,6 +38,7 @@ export class GameCanvas extends React.Component {
     private tankHeight: number = 60;
     private bulletWidth: number = 3;
     private bulletHeight: number = 3;
+    private bulletSpeed: number = 4;
     componentDidMount() {
         this.chatService = this.context.chatService;
         var st = this.state;
@@ -67,9 +68,9 @@ export class GameCanvas extends React.Component {
 
             if (this.state.bullets.length > 0 || this.state.enemyBullets.length > 0) {
                 var tempState = this.state;
-                var bullets = this.state.bullets.map(s => { return { x: s.x + 2, y: s.y } as CoOrdinate }).filter(s => s.x < this.ctx.canvas.width);
+                var bullets = this.state.bullets.map(s => { return { x: s.x + this.bulletSpeed, y: s.y } as CoOrdinate }).filter(s => s.x < this.ctx.canvas.width);
                 tempState.bullets = bullets;
-                var enemyBullets = this.state.enemyBullets.map(s => { return { x: s.x + 4, y: s.y } as CoOrdinate }).filter(s => s.x < this.ctx.canvas.width);
+                var enemyBullets = this.state.enemyBullets.map(s => { return { x: s.x - this.bulletSpeed, y: s.y } as CoOrdinate }).filter(s => s.x > 0);
                 tempState.enemyBullets = enemyBullets;
                 this.setState({
                     tempState
@@ -77,13 +78,22 @@ export class GameCanvas extends React.Component {
                 this.renderCanvas();
             }
         }, 15);
+        this.chatService.bindToEvent(EventNames.TANK_POSITION_RECEIVED, this.receiveTankCordinateHandle);
+        this.chatService.bindToEvent(EventNames.BULLET_RECEIVED, this.receiveBulletHandle);
 
     }
     componentWillUnmount() {
         clearInterval(this.interval);
+        this.chatService.unbindFromEvent(EventNames.TANK_POSITION_RECEIVED, this.receiveTankCordinateHandle);
+        this.chatService.unbindFromEvent(EventNames.BULLET_RECEIVED, this.receiveBulletHandle);
     }
     receiveBulletHandle = (msg: RtcMessage) => {
         var bulletCoord: CoOrdinate = JSON.parse(msg.MessageValue);
+        var s = this.state;
+        s.enemyBullets = [...s.enemyBullets, { x: this.state.canvSize - bulletCoord.x, y: bulletCoord.y }]
+        this.setState({
+            s
+        })
     }
     receiveTankCordinateHandle = (msg: RtcMessage) => {
         var tankCoord: CoOrdinate = JSON.parse(msg.MessageValue);
@@ -101,12 +111,17 @@ export class GameCanvas extends React.Component {
         this.state.bullets.forEach(s => {
             this.ctx.drawImage(this.imageSource, s.x, s.y, 3, 3);
         });
+        this.state.enemyBullets.forEach(s => {
+            this.ctx.drawImage(this.imageSource, s.x, s.y, 3, 3);
+        });
     }
 
     render() {
-        return (<div ref={this.compRef} style={{ width: '100%' }}><canvas ref='canvas' id="game-canvas" tabIndex={0} onKeyDownCapture={this.keyPressedOnCanvas} height='550' width={this.state.canvSize} onKeyDown={this.keyPressedOnCanvas} style={{ background: 'WHITE' }}>
+        return (<div ref={this.compRef} style={{ width: '100%' }}>
+            <canvas ref='canvas' id="game-canvas" tabIndex={0} onKeyDownCapture={this.keyPressedOnCanvas} height='550' width={this.state.canvSize} onKeyDown={this.keyPressedOnCanvas} style={{ background: 'WHITE' }}>
 
-        </canvas></div>);
+            </canvas>
+        </div>);
     }
     keyPressedOnCanvas = (evt: React.KeyboardEvent<HTMLCanvasElement>) => {
         var dx = 0;
@@ -138,9 +153,10 @@ export class GameCanvas extends React.Component {
         console.log(evt.keyCode);
 
         if (bulletShot) {
-            var bullets = [...st.bullets, st.myPos];
+            var bulletPos = { x: st.myPos.x + this.tankWidth, y: st.myPos.y + (this.tankHeight * 0.1) } as CoOrdinate;
+            var bullets = [...st.bullets, bulletPos];
             st.bullets = bullets;
-            this.chatService.publishViaDataChannel({ MessageType: RtcMessageTypes.BULLET_POSITION, MessageValue: JSON.stringify(st.myPos) });
+            this.chatService.publishViaDataChannel({ MessageType: RtcMessageTypes.BULLET_POSITION, MessageValue: JSON.stringify(bulletPos) });
         } else {
             this.chatService.publishViaDataChannel({ MessageType: RtcMessageTypes.TANK_POSITION, MessageValue: JSON.stringify(st.myPos) });
         }
