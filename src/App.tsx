@@ -42,7 +42,7 @@ class App extends React.Component {
   handleScoreUpdated = () => {
     this.setState({});
   }
-  private headerTag: string = 'Fao Chat 0.1';
+  private headerTag: string = '1 VS 1 RTC TANK 0.1';
   render() {
 
     return (
