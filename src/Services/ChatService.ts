@@ -77,8 +77,8 @@ class ChatService {
 
         this.connectedUser = data.name;
         this.eventEmitter.emit(EventNames.USER_CONNECTED);
-        this.rtcConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-        this.rtcConnection.createAnswer(
+        this.rtcConnection?.setRemoteDescription(new RTCSessionDescription(data.offer));
+        this.rtcConnection?.createAnswer(
         ).then((answer: RTCSessionDescriptionInit | void) => {
             if (answer) {
                 this.rtcConnection?.setLocalDescription(answer);
