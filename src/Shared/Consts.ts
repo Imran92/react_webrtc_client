@@ -24,9 +24,9 @@ class ConfigSettings {
         { urls: "stun:stun.voxgratia.org" },
         { urls: "stun:stun.xten.com" },
         {
-            urls: "turn:numb.viagenie.ca",
-            credential: "imranastha",
-            username: "i.hossain@asthait.com",
+            urls: "turn:51.79.160.57:3478",
+            credential: "imran920zx",
+            username: "imran",
         },
     ];
 }

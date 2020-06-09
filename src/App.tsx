@@ -5,7 +5,7 @@ import TextInputWithButtonContainer from './Components/MessageInputContainerComp
 import ChatService from './Services/ChatService';
 import { GlobalContext, EventNames } from './Shared/Consts';
 import { MessageContainer } from './Components/MessageContainerComponent';
-import { GameCanvas } from './Components/GameCanvasComponent';
+import GameCanvas from './Components/GameCanvasComponent';
 
 
 interface AppState {
